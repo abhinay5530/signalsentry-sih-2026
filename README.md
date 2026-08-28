@@ -1,4 +1,4 @@
-# SentinelIP
+# SignalSentry
 
 Local **IPDR / PCAP URL-attack investigation** prototype for Smart India Hackathon.
 
