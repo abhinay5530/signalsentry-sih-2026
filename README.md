@@ -1,46 +1,114 @@
 # SignalSentry
 
-Local **IPDR / PCAP URL-attack investigation** prototype for Smart India Hackathon.
+Team Straw Hats · Smart India Hackathon 2026
 
-This is **not** a paste-a-URL phishing checker and **not** live threat intelligence. It ingests IPDR-like CSV/JSON or PCAP/PCAPNG, normalizes HTTP/URL events, runs explainable rule + behavior (+ optional Random Forest) detection, classifies **ATTEMPT / CONFIRMED / UNKNOWN**, and supports IP/CIDR investigation plus CSV/JSON export.
+SignalSentry helps investigators analyze IPDR-like records and PCAP captures to detect and correlate URL-based attacks.
 
-## Honest limitations
+This is **not** a paste-a-URL phishing checker and **not** live threat intelligence.
 
-- Confirmation is a **heuristic** on available HTTP metadata and event sequences — not proof of server compromise.
-- **HTTPS is not decrypted.** Missing paths are labeled `tls_sni_only` / `metadata_only` and are not invented.
-- The bundled dataset is **self-generated**. Do not claim ISP-scale or real-world accuracy.
-- Pattern matching **never executes** payloads and **never visits** extracted URLs.
+## Problem / purpose
 
-## Requirements
+Investigators often get URL and HTTP-related fields from IPDR-like logs or packet captures, but a single request is a poor basis for a verdict. SignalSentry ingests those records, runs rule-based detection, correlates related events, and lets you inspect evidence, IPs/CIDRs, and exports in one place.
 
-- Python 3.10–3.13 recommended (`python3 --version`). Python 3.14 may not have wheels for all packages yet.
-- Node.js 18+
+## How it works
 
-## Run locally
+**Ingest → Normalize → Detect → Correlate → Investigate**
+
+- **Ingest** — Load IPDR-like CSV/JSON or PCAP/PCAPNG through the UI or the local API.
+- **Normalize** — Map columns/packets into a shared HTTP/URL event schema (paths are not invented for HTTPS).
+- **Detect** — Rule families plus simple behavior checks on the normalized events. An optional Random Forest, trained on synthetic labels, can add a supporting score; it is not the primary detector.
+- **Correlate** — Combine related events and HTTP evidence into ATTEMPT / CONFIRMED / UNKNOWN.
+- **Investigate** — Filter detections, open an incident, look up an IP or CIDR, and export CSV/JSON.
+
+Detection code lives in `backend/app/detection/`.
+
+## Detection and verdicts
+
+- **ATTEMPT** — Suspicious attack evidence is present, but there is not enough correlated evidence for this project’s confirmation rules.
+- **CONFIRMED** — Correlated evidence meets the confirmation **heuristics** (typically sequences and HTTP metadata such as earlier failures then a later success — not “the URL matched a regex”). It is not proof of compromise.
+- **UNKNOWN** — Evidence is insufficient or uncertain (including incomplete HTTP, e.g. HTTPS without a decrypted path).
+
+**CONFIRMED is not a URL regex match.** HTTPS payloads are **not** decrypted.
+
+## Attack coverage
+
+Implemented families:
+
+- Typosquatting / URL spoofing
+- SQL Injection
+- Cross-Site Scripting (XSS)
+- Directory Traversal
+- Command Injection
+- Server-Side Request Forgery (SSRF)
+- Local File Inclusion / Remote File Inclusion (LFI/RFI)
+- Credential Stuffing / Brute Force
+- HTTP Parameter Pollution (HPP)
+- XML External Entity Injection (XXE)
+- Web shell upload indicators
+- ANOMALOUS_URL
+
+## Main screens
+
+- Landing page — `/`
+- Command Center — `/dashboard`
+- IPDR Explorer — `/ipdr`
+- Attack Explorer — `/attacks`
+- PCAP Analyzer — `/pcap`
+- Incident Details — `/event/:id`
+- IP Investigate — `/investigate`
+- Reports — `/reports`
+
+## 2-minute demo
+
+You need the backend and frontend running (see Quick start).
+
+1. Open http://localhost:5173/ (landing page, not Command Center).
+2. Click **Launch Dashboard**.
+3. Click **Load synthetic dataset** (seed 42).
+4. Open **Attack Explorer** and use the filters.
+5. On **IP Investigate**, use CIDR `10.50.1.0/24`.
+6. Open an incident from a detection and read the evidence and verdict.
+7. Optionally open **PCAP Analyzer** and upload a PCAP/PCAPNG (synthetic ingest can also write `backend/data/sample.pcap`).
+
+Do not treat the synthetic run as ISP-scale or real-world accuracy.
+
+## Quick start
+
+**Two processes** are required. The Vite dev server proxies `/api` to FastAPI at `127.0.0.1:8000`. If only the frontend is running, the dashboard cannot load data.
+
+Requirements: Python 3.10–3.13 (`python3 --version`; 3.14 may lack wheels) and Node.js 18+.
+
+**Terminal 1 — backend** (`127.0.0.1:8000`):
 
 ```bash
-# Backend
 cd backend
 python3 -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-# optional ML complement (synthetic labels only)
-python app/ml/train.py
 uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
+API docs: http://127.0.0.1:8000/docs
+
+Optional, synthetic labels only — skip unless you want to train the complement model:
+
 ```bash
-# Frontend (second terminal)
+python app/ml/train.py
+```
+
+The app runs without this step.
+
+**Terminal 2 — frontend** (`localhost:5173`):
+
+```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Open [http://127.0.0.1:5173](http://127.0.0.1:5173). Use **Load synthetic dataset** on the Command Center (seed 42). Demo attacker CIDR: `10.50.1.0/24`.
+Then follow the 2-minute demo. You can also generate data with `PYTHONPATH=. python datasets/generate.py` from `backend/`.
 
-Optional sample PCAP is written to `backend/data/sample.pcap` after synthetic ingest (or `python datasets/generate.py` from `backend/` with `PYTHONPATH=.`).
-
-## Tests
+## Testing
 
 ```bash
 cd backend
@@ -48,10 +116,20 @@ source .venv/bin/activate
 PYTHONPATH=. pytest -q
 ```
 
-## IPDR columns
+## Data
 
-Accepted aliases include: `timestamp`, `src_ip`/`source_ip`, `dst_ip`/`dest_ip`, `src_port`, `dst_port`, `protocol`, `http_method`/`method`, `host`, `path`, `query`, `url`, `http_status`/`status`, `response_size`, `user_agent`, `tls_sni`, `dns_qname`.
+- SQLite is created at runtime under `backend/data/` (including `sentinelip.db`). Those files are gitignored.
+- The demo set is **generated by this project** (UI seed 42, or `datasets/generate.py`). There is **no live ISP feed**.
+- Demo CIDR: `10.50.1.0/24`.
+- IPDR-like CSV/JSON aliases include: `timestamp`, `src_ip`/`source_ip`, `dst_ip`/`dest_ip`, `src_port`, `dst_port`, `protocol`, `http_method`/`method`, `host`, `path`, `query`, `url`, `http_status`/`status`, `response_size`, `user_agent`, `tls_sni`, `dns_qname`.
 
-## Architecture
+## Technology stack
 
-Modular monolith: FastAPI + SQLite + React (Vite, Tailwind, Recharts). Detection lives in `backend/app/detection/`.
+Modular monolith: FastAPI, SQLite, React (Vite, Tailwind, Recharts). PCAP via Scapy. Optional Random Forest via scikit-learn (`joblib` model), not required to use the rest of the pipeline.
+
+## Honest limitations
+
+- Confirmation is a **heuristic** on available HTTP metadata and event sequences — not proof of server compromise.
+- **HTTPS is not decrypted.** Missing paths are labeled `tls_sni_only` / `metadata_only` and are not invented.
+- The bundled dataset is **self-generated**. Do not claim ISP-scale or real-world accuracy.
+- Pattern matching **never executes** payloads and **never visits** extracted URLs.
