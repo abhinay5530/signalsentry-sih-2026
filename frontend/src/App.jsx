@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import Shell from "./layout/Shell.jsx";
+import Landing from "./pages/Landing.jsx";
 import CommandCenter from "./pages/CommandCenter.jsx";
 import IpdrExplorer from "./pages/IpdrExplorer.jsx";
 import AttackExplorer from "./pages/AttackExplorer.jsx";
@@ -11,8 +12,9 @@ import Reports from "./pages/Reports.jsx";
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<Landing />} />
       <Route element={<Shell />}>
-        <Route path="/" element={<CommandCenter />} />
+        <Route path="/dashboard" element={<CommandCenter />} />
         <Route path="/ipdr" element={<IpdrExplorer />} />
         <Route path="/attacks" element={<AttackExplorer />} />
         <Route path="/pcap" element={<PcapAnalyzer />} />
