@@ -9,12 +9,26 @@ export default function AttackExplorer() {
   const [data, setData] = useState({ detections: [], total: 0 });
 
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
+    let cancelled = false;
     setErr("");
+    setLoading(true);
     api
       .detections({ ...filters, limit: 250 })
-      .then(setData)
-      .catch((e) => setErr(e.message));
+      .then((d) => {
+        if (!cancelled) setData(d);
+      })
+      .catch((e) => {
+        if (!cancelled) setErr(e.message);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [filters]);
 
   return (
@@ -24,12 +38,16 @@ export default function AttackExplorer() {
           <h1 className="si-h1">Attack Explorer</h1>
           <p className="si-lede">Query detections by type, IP/CIDR, status, and severity. Confirmed ≠ URL-only.</p>
         </div>
-        <span className="text-xs text-soc-muted font-mono tabular-nums shrink-0">{data.total} detections</span>
+        <span className="text-xs text-soc-muted font-mono tabular-nums shrink-0">
+          {loading ? "Loading…" : `${data.total} detections`}
+        </span>
       </div>
       <FilterBar value={filters} onChange={setFilters} />
       {err && <p className="text-red-400 text-xs mb-2">{err}</p>}
       <div className="si-table-wrap max-h-[70vh]">
-        {!data.detections.length ? (
+        {loading ? (
+          <p className="si-empty">Loading…</p>
+        ) : !data.detections.length ? (
           <p className="si-empty">No detections match the current filters.</p>
         ) : (
           <table className="si-table">
