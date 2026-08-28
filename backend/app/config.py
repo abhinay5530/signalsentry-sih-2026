@@ -17,4 +17,5 @@ MAX_PCAP_PACKETS = 50_000
 CORS_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:5173",
+    "https://signalsentry-sih-2026.vercel.app",
 ]

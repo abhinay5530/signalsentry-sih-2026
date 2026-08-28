@@ -1,4 +1,6 @@
-const API = "/api";
+const API = import.meta.env.PROD
+  ? "https://signalsentry-sih-2026.onrender.com/api"
+  : "/api";
 
 async function handle(res) {
   if (!res.ok) {
