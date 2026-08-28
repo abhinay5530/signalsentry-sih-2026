@@ -36,12 +36,17 @@ export default function IncidentDetails() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="si-h1">Incident {e.id}</h1>
-        <p className="si-lede">
-          Pattern match plus HTTP/IPDR metadata from this event. Heuristic verdict — not “AI says malicious,” not
-          proof of compromise.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <div>
+          <h1 className="si-h1">Incident {e.id}</h1>
+          <p className="si-lede">
+            Pattern match plus HTTP/IPDR metadata from this event. Heuristic verdict — not “AI says malicious,” not
+            proof of compromise.
+          </p>
+        </div>
+        <Link to="/attacks" className="si-btn shrink-0 self-start">
+          Back to Attack Explorer
+        </Link>
       </div>
 
       <div className="si-card p-4">
@@ -62,7 +67,16 @@ export default function IncidentDetails() {
         </div>
         <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1.5 text-sm font-mono">
           <Row k="timestamp" v={e.timestamp} />
-          <Row k="source IP" v={e.src_ip} />
+          <div className="flex gap-2">
+            <span className="text-soc-muted w-28 shrink-0 text-[11px] uppercase tracking-[0.06em]">source IP</span>
+            {e.src_ip ? (
+              <Link className="text-soc-cyan hover:underline break-all" to={`/investigate?ip=${encodeURIComponent(e.src_ip)}`}>
+                {e.src_ip}
+              </Link>
+            ) : (
+              <span className="text-slate-200">—</span>
+            )}
+          </div>
           <Row k="dest IP" v={e.dst_ip} />
           <Row k="method" v={e.http_method} />
           <Row k="HTTP status" v={e.http_status} />

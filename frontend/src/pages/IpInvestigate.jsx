@@ -3,42 +3,54 @@ import { Link, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import StatusBadge from "../components/StatusBadge";
 
+const DEFAULT_CIDR = "10.50.1.0/24";
+
 export default function IpInvestigate() {
   const [sp, setSp] = useSearchParams();
-  const [q, setQ] = useState(sp.get("ip") || "10.50.1.0/24");
+  const ipParam = sp.get("ip");
+  const [q, setQ] = useState(ipParam || DEFAULT_CIDR);
   const [data, setData] = useState(null);
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const run = (ip) => {
+  useEffect(() => {
+    const ip = ipParam || DEFAULT_CIDR;
+    setQ(ip);
+    let cancelled = false;
     setErr("");
     setLoading(true);
     api
       .investigate(ip)
-      .then(setData)
-      .catch((e) => {
-        setData(null);
-        setErr(e.message);
+      .then((d) => {
+        if (!cancelled) setData(d);
       })
-      .finally(() => setLoading(false));
-  };
-
-  useEffect(() => {
-    if (sp.get("ip")) run(sp.get("ip"));
-  }, [sp]);
+      .catch((e) => {
+        if (!cancelled) {
+          setData(null);
+          setErr(e.message);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [ipParam]);
 
   return (
     <div>
       <h1 className="si-h1">IP investigation</h1>
       <p className="si-lede mb-4">
-        Single IPv4 or CIDR against ingested events. Demo attacker range: <span className="font-mono">10.50.1.0/24</span>
+        Single IPv4 or CIDR against ingested events. Demo attacker range: <span className="font-mono">{DEFAULT_CIDR}</span>
       </p>
       <form
         className="flex flex-wrap gap-2 mb-6"
         onSubmit={(e) => {
           e.preventDefault();
-          setSp({ ip: q });
-          run(q);
+          const next = (q || "").trim() || DEFAULT_CIDR;
+          const current = ipParam || DEFAULT_CIDR;
+          if (next !== current) setSp({ ip: next });
         }}
       >
         <input className="si-input w-full sm:w-72" value={q} onChange={(e) => setQ(e.target.value)} />
