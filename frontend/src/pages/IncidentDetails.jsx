@@ -4,6 +4,7 @@ import { api } from "../api";
 import EvidenceList from "../components/EvidenceList";
 import MlSupportCard, { withoutMlEvidence } from "../components/MlSupportCard";
 import StatusBadge, { SeverityBadge } from "../components/StatusBadge";
+import VerdictLegend from "../components/VerdictLegend";
 import { analystExplanation, selectPrimaryAttack, supportingEvidence } from "../primaryAttack";
 
 export default function IncidentDetails() {
@@ -12,37 +13,77 @@ export default function IncidentDetails() {
   const [err, setErr] = useState("");
 
   useEffect(() => {
+    setData(null);
+    setErr("");
     api.event(id).then(setData).catch((e) => setErr(e.message));
   }, [id]);
 
-  if (err) return <p className="text-red-400">{err}</p>;
-  if (!data) return <p className="text-soc-muted">Loading…</p>;
+  if (err) {
+    return (
+      <div className="max-w-lg si-card p-6">
+        <h1 className="si-h1">Incident</h1>
+        <p className="si-empty py-4 text-red-300">API error: {err}</p>
+      </div>
+    );
+  }
+  if (!data) return <p className="si-empty">Loading incident…</p>;
   const e = data.event;
   const feats = e.features || {};
   const detections = data.detections || [];
   const { primary, supporting, reasonKey } = selectPrimaryAttack(detections, e.scenario_id);
   const explanation = analystExplanation(primary, supporting, reasonKey);
+  const whyItems = withoutMlEvidence(primary?.evidence || []);
 
   return (
     <div className="space-y-4">
       <div>
         <h1 className="si-h1">Incident {e.id}</h1>
-        <p className="si-lede">Explainable finding — pattern match + HTTP metadata, not “AI says malicious.”</p>
+        <p className="si-lede">
+          Pattern match plus HTTP/IPDR metadata from this event. Heuristic verdict — not “AI says malicious,” not
+          proof of compromise.
+        </p>
       </div>
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="si-card p-4 text-sm space-y-1.5 font-mono">
+
+      <div className="si-card p-4">
+        <h2 className="si-card-h">Finding</h2>
+        <div className="flex flex-wrap items-center gap-2.5 mb-4">
+          {primary ? (
+            <>
+              <span className="text-lg font-semibold text-slate-100">{primary.attack_type}</span>
+              <StatusBadge status={primary.status} />
+              <SeverityBadge severity={primary.severity} />
+              <span className="text-xs font-mono text-soc-muted">
+                risk {primary.risk_score} · {primary.detectors}
+              </span>
+            </>
+          ) : (
+            <span className="text-sm text-soc-muted">No detection on this event.</span>
+          )}
+        </div>
+        <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1.5 text-sm font-mono">
           <Row k="timestamp" v={e.timestamp} />
-          <Row k="src → dst" v={`${e.src_ip}:${e.src_port} → ${e.dst_ip}:${e.dst_port}`} />
+          <Row k="source IP" v={e.src_ip} />
+          <Row k="dest IP" v={e.dst_ip} />
           <Row k="method" v={e.http_method} />
+          <Row k="HTTP status" v={e.http_status} />
           <Row k="host" v={e.host} />
           <Row k="path" v={e.path} />
           <Row k="query" v={e.query} />
           <Row k="url" v={e.url} />
-          <Row k="http_status" v={e.http_status} />
-          <Row k="response_size" v={e.response_size} />
-          <Row k="availability" v={e.url_availability} />
           <Row k="tls_sni" v={e.tls_sni} />
+          <Row k="availability" v={e.url_availability} />
           <Row k="source" v={e.source_type} />
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="si-card p-4 text-sm space-y-1.5 font-mono">
+          <h2 className="si-card-h">HTTP / capture fields</h2>
+          <Row k="src → dst" v={`${e.src_ip}:${e.src_port} → ${e.dst_ip}:${e.dst_port}`} />
+          <Row k="response_size" v={e.response_size} />
+          <Row k="user_agent" v={e.user_agent} />
+          <Row k="dns_qname" v={e.dns_qname} />
+          <Row k="http_complete" v={e.http_complete} />
         </div>
         <div className="si-card p-4">
           <h2 className="si-card-h">URL / structural features</h2>
@@ -59,19 +100,15 @@ export default function IncidentDetails() {
         </div>
       </div>
 
-      {!detections.length && <p className="si-empty si-card">No detections on this event.</p>}
+      <VerdictLegend />
 
       {primary && (
         <div className="si-card p-4 border-soc-cyan/35">
-          <div className="text-[10px] uppercase tracking-[0.14em] text-soc-cyan font-mono mb-2">Primary attack</div>
-          <div className="flex flex-wrap items-center gap-2.5 mb-3">
-            <span className="text-lg font-semibold text-slate-100">{primary.attack_type}</span>
-            <StatusBadge status={primary.status} />
-            <SeverityBadge severity={primary.severity} />
-            <span className="text-xs font-mono text-soc-muted">
-              risk {primary.risk_score} · {primary.detectors}
-            </span>
-          </div>
+          <h2 className="si-card-h">Why this was flagged</h2>
+          <p className="text-xs text-soc-muted mb-3 leading-relaxed">
+            Text below is from this event’s stored detectors and evidence. Nothing is added that the API did not
+            return.
+          </p>
           {supporting.length > 0 && (
             <p className="text-xs text-amber-100/85 mb-3 border border-amber-500/20 bg-amber-500/[0.06] rounded-md px-3 py-2 leading-relaxed">
               One HTTP transaction · {detections.length} correlated indicators. Supporting signatures are not separate
@@ -79,10 +116,12 @@ export default function IncidentDetails() {
             </p>
           )}
           {explanation && <p className="text-sm text-slate-300 mb-3 leading-relaxed">{explanation}</p>}
-          <EvidenceList items={withoutMlEvidence(primary.evidence || [])} hideEmpty />
+          <EvidenceList items={whyItems} hideEmpty />
           <MlSupportCard score={primary.ml_score} />
         </div>
       )}
+
+      {!detections.length && <p className="si-empty si-card">No detections on this event.</p>}
 
       {supporting.length > 0 && (
         <div className="si-card p-4 bg-[#080d14]">

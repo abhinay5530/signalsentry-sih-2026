@@ -89,6 +89,12 @@
     @apply text-[10px] text-soc-muted uppercase tracking-[0.14em] font-medium;
   }
   .si-kpi-value {
-    @apply text-[1.65rem] font-semibold mt-1.5 font-mono tabular-nums leading-none text-soc-cyan;
+    @apply text-[1.75rem] md:text-[1.85rem] font-semibold mt-1.5 font-mono tabular-nums leading-none text-soc-cyan;
+  }
+  .si-notice {
+    @apply text-xs text-soc-muted leading-relaxed border border-soc-border rounded-md px-3 py-2.5 bg-[#080d14];
+  }
+  .si-ok {
+    @apply text-xs text-soc-cyan leading-relaxed border border-soc-cyan/25 rounded-md px-3 py-2.5 bg-soc-cyan/[0.06];
   }
 }

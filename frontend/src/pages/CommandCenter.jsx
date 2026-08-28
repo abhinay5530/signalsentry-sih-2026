@@ -17,6 +17,7 @@ import {
 } from "recharts";
 import { api } from "../api";
 import StatusBadge from "../components/StatusBadge";
+import VerdictLegend from "../components/VerdictLegend";
 
 const COLORS = ["#3ee0d4", "#f59e0b", "#ef4444", "#64748b", "#a78bfa", "#34d399", "#fb7185"];
 const tooltipStyle = { background: "#0d1522", border: "1px solid #1c2a3d", fontSize: 12 };
@@ -65,7 +66,9 @@ export default function CommandCenter() {
     return (
       <div className="max-w-lg si-card p-6">
         <h1 className="si-h1">Command Center</h1>
-        <p className="si-lede mb-5">{err || "Loading…"} Start the FastAPI backend on port 8000 if this persists.</p>
+        <p className="si-lede mb-5">
+          {err || "Loading overview…"} If this persists, start FastAPI on port 8000 (Vite proxies /api).
+        </p>
         <button onClick={loadSynth} disabled={busy} className="si-btn-primary">
           {busy ? "Detecting…" : "Load synthetic dataset"}
         </button>
@@ -93,11 +96,26 @@ export default function CommandCenter() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
           <h1 className="si-h1">Command Center</h1>
-          <p className="si-lede">Heuristic detections from ingested IPDR/PCAP — not live threat intelligence.</p>
+          <p className="si-lede">
+            Heuristic detections from ingested IPDR-like records and PCAP — not live threat intelligence, not proof of
+            compromise.
+          </p>
         </div>
         <button onClick={loadSynth} disabled={busy} className="si-btn shrink-0 self-start sm:self-auto">
           {busy ? "Reloading…" : "Reload synthetic"}
         </button>
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-3">
+        <div className="si-card p-4">
+          <h2 className="si-card-h">Detection method</h2>
+          <p className="text-xs text-soc-muted leading-relaxed">
+            Rules and behavior checks run on normalized HTTP/IPDR metadata. Correlation uses request sequences and
+            available HTTP fields (for example earlier errors then a later success). An optional Random Forest score
+            is supporting only. HTTPS payloads are not decrypted.
+          </p>
+        </div>
+        <VerdictLegend />
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">

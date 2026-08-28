@@ -7,10 +7,17 @@ export default function IpdrExplorer() {
   const [filters, setFilters] = useState({});
   const [data, setData] = useState({ events: [], total: 0 });
   const [msg, setMsg] = useState("");
+  const [ok, setOk] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const load = () => {
-    api.events({ ...filters, limit: 150 }).then(setData).catch((e) => setMsg(e.message));
+    setLoading(true);
+    api
+      .events({ ...filters, limit: 150 })
+      .then(setData)
+      .catch((e) => setMsg(e.message))
+      .finally(() => setLoading(false));
   };
   useEffect(load, [filters]);
 
@@ -19,12 +26,15 @@ export default function IpdrExplorer() {
     if (!f) return;
     setBusy(true);
     setMsg("");
+    setOk(false);
     try {
       const r = await api.ingestIpdr(f);
       setMsg(`Ingested ${r.events} events, ${r.detections} detections`);
+      setOk(true);
       load();
     } catch (err) {
       setMsg(err.message);
+      setOk(false);
     } finally {
       setBusy(false);
     }
@@ -32,27 +42,35 @@ export default function IpdrExplorer() {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-4">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-3 mb-4">
         <div>
           <h1 className="si-h1">IPDR Explorer</h1>
           <p className="si-lede">
-            Upload CSV/JSON with column aliases (timestamp, src_ip, dst_ip, url/host/path…). Simulated or mapped IPDR —
-            not a live ISP feed.
+            Upload <strong className="text-slate-300 font-medium">IPDR-like CSV/JSON</strong> (column aliases:
+            timestamp, src_ip, dst_ip, url/host/path…). Demo data is self-generated — not a live ISP feed.
           </p>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
-          <label className="si-btn cursor-pointer">
-            {busy ? "Parsing…" : "Upload IPDR CSV/JSON"}
-            <input type="file" accept=".csv,.json" className="hidden" onChange={onFile} />
-          </label>
-          <span className="text-xs text-soc-muted font-mono tabular-nums">{data.total} events</span>
-        </div>
+        <span className="text-xs text-soc-muted font-mono tabular-nums shrink-0">
+          {loading ? "Loading…" : `${data.total} events`}
+        </span>
       </div>
-      {msg && <p className="text-xs text-amber-200/90 mb-3">{msg}</p>}
+
+      <div className="si-card p-4 mb-4 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="flex-1 text-xs text-soc-muted leading-relaxed">
+          Ingest maps rows into the same event schema as the synthetic dataset, then runs detection and correlation.
+        </div>
+        <label className="si-btn-primary cursor-pointer shrink-0">
+          {busy ? "Parsing…" : "Upload IPDR-like CSV/JSON"}
+          <input type="file" accept=".csv,.json" className="hidden" onChange={onFile} />
+        </label>
+      </div>
+      {msg && <p className={`mb-3 ${ok ? "si-ok" : "si-notice text-red-300"}`}>{msg}</p>}
       <FilterBar value={filters} onChange={setFilters} />
       <div className="si-table-wrap max-h-[70vh]">
-        {!data.events.length ? (
-          <p className="si-empty">No events match the current filters.</p>
+        {loading ? (
+          <p className="si-empty">Loading events…</p>
+        ) : !data.events.length ? (
+          <p className="si-empty">No events match the current filters. Load synthetic data or upload a file.</p>
         ) : (
           <table className="si-table">
             <thead>

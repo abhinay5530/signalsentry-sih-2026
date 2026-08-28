@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import { Crosshair, Database, FileSearch, Radio, Shield } from "lucide-react";
+import { Crosshair, Database, FileJson, FileSearch, GitBranch, Network, Shield } from "lucide-react";
 import { api } from "../api";
 
 /** Replace when the public GitHub URL is confirmed. */
@@ -11,28 +11,38 @@ const tooltipStyle = { background: "#0d1522", border: "1px solid #1c2a3d", fontS
 
 const features = [
   {
-    title: "IPDR Analysis",
-    icon: Database,
-    text: "Ingest IPDR-like CSV/JSON, normalize HTTP/URL fields, and query events in the explorer.",
-  },
-  {
-    title: "PCAP Analysis",
-    icon: Radio,
-    text: "Parse PCAP/PCAPNG locally. Extract cleartext HTTP and SNI; HTTPS paths are not invented.",
-  },
-  {
     title: "Attack Detection",
     icon: Crosshair,
-    text: "Rule-based URL-attack families with ATTEMPT, CONFIRMED, and UNKNOWN from HTTP/IPDR evidence.",
+    text: "Rule families on normalized HTTP/URL fields, plus simple behavior checks. Not live threat intelligence.",
   },
   {
-    title: "Incident Investigation",
+    title: "Evidence Correlation",
+    icon: GitBranch,
+    text: "Related events and HTTP metadata are combined into ATTEMPT, CONFIRMED, or UNKNOWN heuristics.",
+  },
+  {
+    title: "IP/CIDR Investigation",
+    icon: Network,
+    text: "Look up a source or destination IPv4 or CIDR (demo range 10.50.1.0/24) and inspect related activity.",
+  },
+  {
+    title: "PCAP/IPDR Analysis",
+    icon: Database,
+    text: "Ingest IPDR-like CSV/JSON or PCAP/PCAPNG. HTTPS paths are not invented from encrypted payloads.",
+  },
+  {
+    title: "Explainable Verdicts",
     icon: FileSearch,
-    text: "Open an event for evidence, related traffic, IP/CIDR investigation, and CSV/JSON export.",
+    text: "Each finding shows detectors, evidence snippets, and HTTP context already in the ingested record.",
+  },
+  {
+    title: "CSV/JSON Reports",
+    icon: FileJson,
+    text: "Export the current filtered detections joined to events for offline review.",
   },
 ];
 
-const steps = ["IPDR / PCAP", "Normalize", "Detect", "Correlate", "Investigate"];
+const steps = ["INGEST", "NORMALIZE", "DETECT", "CORRELATE", "INVESTIGATE"];
 
 export default function Landing() {
   const [ov, setOv] = useState(null);
@@ -59,18 +69,22 @@ export default function Landing() {
           </span>
           <span className="text-sm font-semibold tracking-[0.04em]">SignalSentry</span>
         </div>
-        <Link to="/dashboard" className="si-btn">
+        <Link to="/dashboard" className="si-btn-primary !py-1.5 !text-xs">
           Launch Dashboard
         </Link>
       </header>
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-5 md:px-8 py-12 md:py-16 space-y-16">
         <section className="max-w-2xl">
-          <h1 className="text-3xl md:text-[2rem] font-semibold tracking-tight text-slate-50">SignalSentry</h1>
-          <p className="mt-2 text-soc-cyan font-mono text-sm tracking-wide">Detect. Correlate. Investigate.</p>
+          <p className="text-[11px] font-mono uppercase tracking-[0.16em] text-soc-cyan">Team Straw Hats · SIH 2026</p>
+          <h1 className="mt-3 text-3xl md:text-[2.15rem] font-semibold tracking-tight text-slate-50">SignalSentry</h1>
+          <p className="mt-2 text-soc-cyan font-mono text-sm md:text-[15px] tracking-wide">
+            IPDR &amp; PCAP URL-Attack Investigation
+          </p>
+          <p className="mt-2 text-soc-muted font-mono text-xs tracking-wide">Detect. Correlate. Investigate.</p>
           <p className="mt-4 text-sm md:text-[15px] text-soc-muted leading-relaxed">
-            A security investigation platform for detecting and analyzing URL-based attacks from IPDR and network
-            capture data.
+            A local investigation workspace for URL-based attacks in IPDR-like records and packet captures. Heuristic
+            findings from ingested data — not an ISP feed, not HTTPS decryption, not live intel.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link to="/dashboard" className="si-btn-primary">
@@ -83,8 +97,20 @@ export default function Landing() {
         </section>
 
         <section>
-          <h2 className="si-card-h">What it does</h2>
-          <div className="grid sm:grid-cols-2 gap-3">
+          <h2 className="si-card-h">Pipeline</h2>
+          <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
+            {steps.map((s, i) => (
+              <span key={s} className="flex items-center gap-2">
+                <span className="si-card px-2.5 py-1.5 text-slate-100 tracking-[0.08em]">{s}</span>
+                {i < steps.length - 1 && <span className="text-soc-muted">→</span>}
+              </span>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="si-card-h">Capabilities</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {features.map(({ title, icon: Icon, text }) => (
               <div key={title} className="si-card p-4">
                 <div className="flex items-center gap-2 text-slate-100 text-sm font-medium">
@@ -98,25 +124,13 @@ export default function Landing() {
         </section>
 
         <section>
-          <h2 className="si-card-h">Workflow</h2>
-          <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
-            {steps.map((s, i) => (
-              <span key={s} className="flex items-center gap-2">
-                <span className="si-card px-2.5 py-1.5 text-slate-200">{s}</span>
-                {i < steps.length - 1 && <span className="text-soc-muted">→</span>}
-              </span>
-            ))}
-          </div>
-        </section>
-
-        <section>
           <h2 className="si-card-h">Live console preview</h2>
           <p className="text-xs text-soc-muted mb-3">Counts below come from the same overview API as Command Center.</p>
           <div className="si-card p-4 space-y-4">
             {!ov && !apiErr && <p className="text-sm text-soc-muted">Loading overview…</p>}
             {apiErr && (
               <p className="text-sm text-soc-muted">
-                Preview needs the backend on port 8000. {apiErr}
+                Preview needs the FastAPI backend on port 8000. {apiErr}
               </p>
             )}
             {ov && !hasData && (

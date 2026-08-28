@@ -10,18 +10,27 @@ export default function Reports() {
     <div>
       <h1 className="si-h1">Reports & export</h1>
       <p className="si-lede mb-4">
-        Exports the current filter as CSV or JSON (detections joined to events). Heuristic findings only.
+        Downloads use the <strong className="text-slate-300 font-medium">current filter</strong> below. Files contain
+        detections joined to events — heuristic investigation results, not a precision/recall scorecard.
       </p>
       <FilterBar value={filters} onChange={setFilters} />
-      <div className="flex flex-wrap gap-3">
-        <a className="si-btn-primary" href={api.exportUrl("csv", qs)}>
-          Download CSV
+      <div className="grid sm:grid-cols-2 gap-3 max-w-2xl">
+        <a className="si-card p-5 hover:border-soc-cyan/40 block" href={api.exportUrl("csv", qs)}>
+          <div className="text-[10px] uppercase tracking-[0.14em] text-soc-muted mb-2">Export</div>
+          <div className="text-soc-cyan font-semibold">Download CSV</div>
+          <p className="text-xs text-soc-muted mt-2 leading-relaxed">
+            Spreadsheet of the filtered join (same query params as Attack Explorer).
+          </p>
         </a>
-        <a className="si-btn" href={api.exportUrl("json", qs)}>
-          Download JSON
+        <a className="si-card p-5 hover:border-soc-cyan/40 block" href={api.exportUrl("json", qs)}>
+          <div className="text-[10px] uppercase tracking-[0.14em] text-soc-muted mb-2">Export</div>
+          <div className="text-slate-100 font-semibold">Download JSON</div>
+          <p className="text-xs text-soc-muted mt-2 leading-relaxed">
+            Same filtered set as JSON for tooling or further review.
+          </p>
         </a>
       </div>
-      <div className="si-card p-4 mt-6 text-sm text-soc-muted max-w-2xl space-y-2 leading-relaxed">
+      <div className="si-notice mt-6 max-w-2xl space-y-2">
         <p>
           Confirmation is based on HTTP status, response size bands, and request sequences in the ingested data — not
           host forensics.

@@ -65,7 +65,7 @@ export default function Shell() {
         <header className="h-11 shrink-0 border-b border-soc-border flex items-center justify-between gap-3 px-4 md:px-6 text-[11px] text-soc-muted bg-[#080d14]/80">
           <span className="flex items-center gap-2 min-w-0">
             <Activity size={13} className="text-soc-cyan shrink-0" />
-            <span className="truncate">SignalSentry · Detect. Correlate. Investigate.</span>
+          <span className="truncate">INGEST → NORMALIZE → DETECT → CORRELATE → INVESTIGATE</span>
           </span>
           <span className="font-mono shrink-0 text-slate-500">127.0.0.1 · SQLite</span>
         </header>
