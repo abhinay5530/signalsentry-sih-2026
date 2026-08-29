@@ -62,9 +62,9 @@ export default function IpInvestigate() {
       {loading && !data && <p className="si-empty">Loading investigation…</p>}
       {data && (
         <div className="space-y-4">
-          <div className="si-card px-4 py-3 flex flex-wrap items-center gap-3">
-            <span className="si-kpi-label mb-0">Queried</span>
-            <span className="font-mono text-soc-cyan text-sm">{data.query || q}</span>
+          <div className="si-card px-4 py-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <span className="si-kpi-label mb-0">Queried IP / CIDR</span>
+            <span className="font-mono text-soc-cyan text-lg md:text-xl tracking-tight">{data.query || q}</span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
@@ -85,7 +85,7 @@ export default function IpInvestigate() {
                 <p className="si-empty py-4">No attack types for this query.</p>
               ) : (
                 (data.by_type || []).map((t) => (
-                  <div key={t.attack_type} className="flex justify-between text-xs py-1.5 border-b border-soc-border/80">
+                  <div key={t.attack_type} className="flex justify-between text-[13px] py-1.5 border-b border-soc-border/80">
                     <span className="text-slate-300 pr-3">{t.attack_type}</span>
                     <span className="font-mono tabular-nums text-soc-muted">{t.c}</span>
                   </div>
@@ -97,7 +97,7 @@ export default function IpInvestigate() {
                 <p className="si-empty py-4">No verdicts for this query.</p>
               ) : (
                 (data.by_status || []).map((t) => (
-                  <div key={t.status} className="flex justify-between items-center text-xs py-1.5 border-b border-soc-border/80">
+                  <div key={t.status} className="flex justify-between items-center text-[13px] py-1.5 border-b border-soc-border/80">
                     <StatusBadge status={t.status} />
                     <span className="font-mono tabular-nums text-soc-muted">{t.c}</span>
                   </div>
@@ -111,7 +111,7 @@ export default function IpInvestigate() {
                 <p className="si-empty py-4">No related IPs.</p>
               ) : (
                 (data.neighbors || []).map((n) => (
-                  <div key={n.ip} className="flex justify-between text-xs py-1.5 border-b border-soc-border/80">
+                  <div key={n.ip} className="flex justify-between text-[13px] py-1.5 border-b border-soc-border/80">
                     <Link className="text-soc-cyan font-mono hover:underline" to={`/investigate?ip=${n.ip}`}>
                       {n.ip}
                     </Link>
@@ -127,7 +127,7 @@ export default function IpInvestigate() {
                 (data.sample || []).map((d) => (
                   <div
                     key={d.detection_id}
-                    className="text-xs py-2 border-b border-soc-border/80 flex flex-wrap gap-2 items-center"
+                    className="text-[13px] py-2 border-b border-soc-border/80 flex flex-wrap gap-2 items-center"
                   >
                     <Link className="text-soc-cyan font-mono hover:underline" to={`/event/${d.event_id}`}>
                       #{d.event_id}
@@ -146,7 +146,7 @@ export default function IpInvestigate() {
             ) : (
               <div className="max-h-64 overflow-auto">
                 {(data.timeline || []).map((e, i) => (
-                  <div key={i} className="flex flex-wrap gap-2 text-xs py-1.5 border-b border-soc-border/80 font-mono">
+                  <div key={i} className="flex flex-wrap gap-2 text-[13px] py-1.5 border-b border-soc-border/80 font-mono">
                     <span className="text-slate-500">{(e.timestamp || "").slice(0, 19)}</span>
                     <span className="text-soc-cyan">{e.src_ip}</span>
                     <span className="text-slate-400 truncate">{e.path || "—"}</span>

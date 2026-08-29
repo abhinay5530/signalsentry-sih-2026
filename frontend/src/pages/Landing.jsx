@@ -74,20 +74,21 @@ export default function Landing() {
         </Link>
       </header>
 
-      <main className="flex-1 max-w-5xl w-full mx-auto px-5 md:px-8 py-12 md:py-16 space-y-16">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-5 md:px-8 py-14 md:py-20 space-y-14">
         <section className="max-w-2xl">
-          <p className="text-[11px] font-mono uppercase tracking-[0.16em] text-soc-cyan">Team Straw Hats · SIH 2026</p>
-          <h1 className="mt-3 text-3xl md:text-[2.15rem] font-semibold tracking-tight text-slate-50">SignalSentry</h1>
-          <p className="mt-2 text-soc-cyan font-mono text-sm md:text-[15px] tracking-wide">
+          <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-soc-cyan">Team Straw Hats · SIH 2026</p>
+          <h1 className="mt-4 text-4xl md:text-[2.5rem] font-semibold tracking-tight text-slate-50 leading-tight">
+            SignalSentry
+          </h1>
+          <p className="mt-3 text-soc-cyan font-mono text-[15px] md:text-base tracking-wide">
             IPDR &amp; PCAP URL-Attack Investigation
           </p>
-          <p className="mt-2 text-soc-muted font-mono text-xs tracking-wide">Detect. Correlate. Investigate.</p>
-          <p className="mt-4 text-sm md:text-[15px] text-soc-muted leading-relaxed">
+          <p className="mt-4 text-[15px] text-soc-muted leading-relaxed">
             A local investigation workspace for URL-based attacks in IPDR-like records and packet captures. Heuristic
             findings from ingested data — not an ISP feed, not HTTPS decryption, not live intel.
           </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link to="/dashboard" className="si-btn-primary">
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link to="/dashboard" className="si-btn-primary px-5 py-2.5">
               Launch Dashboard
             </Link>
             <a className="si-btn" href={GITHUB_URL} target="_blank" rel="noreferrer">
@@ -98,11 +99,13 @@ export default function Landing() {
 
         <section>
           <h2 className="si-card-h">Pipeline</h2>
-          <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
+          <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
             {steps.map((s, i) => (
-              <span key={s} className="flex items-center gap-2">
-                <span className="si-card px-2.5 py-1.5 text-slate-100 tracking-[0.08em]">{s}</span>
-                {i < steps.length - 1 && <span className="text-soc-muted">→</span>}
+              <span key={s} className="flex items-center gap-1.5 md:gap-2">
+                <span className="si-card px-3 py-2.5 text-[11px] md:text-xs font-mono tracking-[0.12em] text-slate-100">
+                  {s}
+                </span>
+                {i < steps.length - 1 && <span className="text-soc-cyan/70 font-mono text-sm">→</span>}
               </span>
             ))}
           </div>
@@ -117,7 +120,7 @@ export default function Landing() {
                   <Icon size={15} className="text-soc-cyan shrink-0" strokeWidth={1.75} />
                   {title}
                 </div>
-                <p className="mt-2 text-xs text-soc-muted leading-relaxed">{text}</p>
+                <p className="mt-2 text-[13px] text-soc-muted leading-relaxed">{text}</p>
               </div>
             ))}
           </div>
@@ -125,7 +128,7 @@ export default function Landing() {
 
         <section>
           <h2 className="si-card-h">Live console preview</h2>
-          <p className="text-xs text-soc-muted mb-3">Counts below come from the same overview API as Command Center.</p>
+          <p className="text-[13px] text-soc-muted mb-3">Counts below come from the same overview API as Command Center.</p>
           <div className="si-card p-4 space-y-4">
             {!ov && !apiErr && <p className="text-sm text-soc-muted">Loading overview…</p>}
             {apiErr && (
@@ -169,7 +172,7 @@ export default function Landing() {
                     </ResponsiveContainer>
                   </div>
                 )}
-                <Link to="/dashboard" className="text-xs text-soc-cyan hover:underline">
+                <Link to="/dashboard" className="text-[13px] text-soc-cyan hover:underline">
                   Open Command Center →
                 </Link>
               </>
@@ -178,7 +181,7 @@ export default function Landing() {
         </section>
       </main>
 
-      <footer className="border-t border-soc-border px-5 py-4 text-center text-[11px] text-soc-muted font-mono">
+      <footer className="border-t border-soc-border px-5 py-4 text-center text-[12px] text-soc-muted font-mono">
         Built by Team Straw Hats · Smart India Hackathon 2026
       </footer>
     </div>

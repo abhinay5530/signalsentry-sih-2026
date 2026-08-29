@@ -42,9 +42,9 @@ export default function AttackExplorer() {
           </p>
         </div>
         <div className="flex items-end gap-4 shrink-0">
-          <div className="text-right">
+          <div className="si-kpi py-3 min-w-[7.5rem] text-right">
             <div className="si-kpi-label">Detections</div>
-            <div className="si-kpi-value text-[1.5rem]">
+            <div className="si-kpi-value text-[1.65rem]">
               {loading ? "…" : err ? "—" : data.total}
             </div>
           </div>
@@ -53,7 +53,7 @@ export default function AttackExplorer() {
           </button>
         </div>
       </div>
-      <p className="text-xs text-soc-muted mb-2 leading-relaxed">
+      <p className="text-[13px] text-soc-muted mb-2 leading-relaxed">
         Start with one filter. Combine filters only when you want to narrow the results further.
       </p>
       <FilterBar value={filters} onChange={setFilters} />

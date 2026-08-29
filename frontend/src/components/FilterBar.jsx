@@ -17,8 +17,9 @@ const TYPES = [
 export default function FilterBar({ value, onChange, extra }) {
   const set = (k, v) => onChange({ ...value, [k]: v });
   return (
-    <div className="si-card p-3 md:p-3.5 mb-4">
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
+    <div className="si-card p-4 md:p-4 mb-4">
+      <h2 className="si-card-h mb-3">Filters</h2>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         <label>
           <span className="si-label">Source IP</span>
           <input
@@ -45,7 +46,7 @@ export default function FilterBar({ value, onChange, extra }) {
             value={value.cidr || ""}
             onChange={(e) => set("cidr", e.target.value)}
           />
-          <span className="block text-[10px] text-soc-muted mt-1 leading-snug">
+          <span className="block text-[11px] text-soc-muted mt-1 leading-snug">
             Use CIDR to investigate a network range.
           </span>
         </label>

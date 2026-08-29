@@ -50,13 +50,13 @@ export default function IpdrExplorer() {
             timestamp, src_ip, dst_ip, url/host/path…). Demo data is self-generated — not a live ISP feed.
           </p>
         </div>
-        <span className="text-xs text-soc-muted font-mono tabular-nums shrink-0">
+        <span className="text-[13px] text-soc-muted font-mono tabular-nums shrink-0">
           {loading ? "Loading…" : `${data.total} events`}
         </span>
       </div>
 
-      <div className="si-card p-4 mb-4 flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className="flex-1 text-xs text-soc-muted leading-relaxed">
+      <div className="si-card p-5 mb-4 flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex-1 text-sm text-soc-muted leading-relaxed">
           Ingest maps rows into the same event schema as the synthetic dataset, then runs detection and correlation.
         </div>
         <label className="si-btn-primary cursor-pointer shrink-0">

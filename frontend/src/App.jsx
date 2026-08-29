@@ -8,6 +8,7 @@ import PcapAnalyzer from "./pages/PcapAnalyzer.jsx";
 import IncidentDetails from "./pages/IncidentDetails.jsx";
 import IpInvestigate from "./pages/IpInvestigate.jsx";
 import Reports from "./pages/Reports.jsx";
+import UserGuide from "./pages/UserGuide.jsx";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/event/:id" element={<IncidentDetails />} />
         <Route path="/investigate" element={<IpInvestigate />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/guide" element={<UserGuide />} />
       </Route>
     </Routes>
   );

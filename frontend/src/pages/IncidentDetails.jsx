@@ -51,13 +51,13 @@ export default function IncidentDetails() {
 
       <div className="si-card p-4">
         <h2 className="si-card-h">Finding</h2>
-        <div className="flex flex-wrap items-center gap-2.5 mb-4">
+        <div className="flex flex-wrap items-center gap-2.5 mb-5 pb-4 border-b border-soc-border">
           {primary ? (
             <>
-              <span className="text-lg font-semibold text-slate-100">{primary.attack_type}</span>
+              <span className="text-xl md:text-2xl font-semibold text-slate-50 tracking-tight">{primary.attack_type}</span>
               <StatusBadge status={primary.status} />
               <SeverityBadge severity={primary.severity} />
-              <span className="text-xs font-mono text-soc-muted">
+              <span className="text-[13px] font-mono text-soc-muted">
                 risk {primary.risk_score} · {primary.detectors}
               </span>
             </>
@@ -68,7 +68,7 @@ export default function IncidentDetails() {
         <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1.5 text-sm font-mono">
           <Row k="timestamp" v={e.timestamp} />
           <div className="flex gap-2">
-            <span className="text-soc-muted w-28 shrink-0 text-[11px] uppercase tracking-[0.06em]">source IP</span>
+            <span className="text-soc-muted w-28 shrink-0 text-[12px] uppercase tracking-[0.06em]">source IP</span>
             {e.src_ip ? (
               <Link className="text-soc-cyan hover:underline break-all" to={`/investigate?ip=${encodeURIComponent(e.src_ip)}`}>
                 {e.src_ip}
@@ -90,6 +90,74 @@ export default function IncidentDetails() {
         </div>
       </div>
 
+      <div className="si-card p-4 md:p-5 border-soc-cyan/40">
+        <h2 className="si-card-h text-soc-cyan/90">Evidence Chain</h2>
+        <p className="text-[13px] text-soc-muted mb-4 leading-relaxed">
+          SignalSentry correlates available evidence before assigning a heuristic verdict; a pattern match alone is not
+          treated as proof of compromise.
+        </p>
+        <ol className="space-y-0 border-l border-soc-border ml-3 md:ml-4">
+          <ChainStep n={1} title="Source Activity">
+            <p className="font-mono text-slate-200">{present(e.src_ip)}</p>
+          </ChainStep>
+          <ChainStep n={2} title="Suspicious Request / Attack Pattern">
+            <p>
+              <span className="text-soc-muted">Attack type: </span>
+              {present(primary?.attack_type)}
+            </p>
+            <p>
+              <span className="text-soc-muted">Method: </span>
+              <span className="font-mono">{present(e.http_method)}</span>
+            </p>
+            <p className="font-mono break-all">
+              <span className="text-soc-muted font-sans">URL / path: </span>
+              {present(e.url || e.path)}
+            </p>
+          </ChainStep>
+          <ChainStep n={3} title="HTTP / Network Evidence">
+            <p>
+              <span className="text-soc-muted">HTTP status: </span>
+              <span className="font-mono">{present(e.http_status)}</span>
+            </p>
+            <p>
+              <span className="text-soc-muted">Availability: </span>
+              <span className="font-mono">{present(e.url_availability)}</span>
+            </p>
+            <p>
+              <span className="text-soc-muted">Host / SNI: </span>
+              <span className="font-mono break-all">{present(e.host || e.tls_sni)}</span>
+            </p>
+          </ChainStep>
+          <ChainStep n={4} title="Correlated Evidence">
+            {explanation ? <p>{explanation}</p> : null}
+            {whyItems.length > 0 ? (
+              <ul className="mt-2 space-y-1.5">
+                {whyItems.map((item, i) => (
+                  <li key={i} className="text-[13px]">
+                    {item.detail ? (
+                      <span>{item.detail}</span>
+                    ) : (
+                      <span className="text-soc-muted">Not available in captured metadata</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            {(data.related || []).length > 0 ? (
+              <p className="mt-2 text-[13px] text-soc-muted">
+                Related events from the same source IP in this response: {(data.related || []).length}
+              </p>
+            ) : null}
+            {!explanation && !whyItems.length && !(data.related || []).length ? (
+              <p>Not available in captured metadata</p>
+            ) : null}
+          </ChainStep>
+          <ChainStep n={5} title="Heuristic Verdict" last>
+            {primary?.status ? <StatusBadge status={primary.status} /> : <p>Not available in captured metadata</p>}
+          </ChainStep>
+        </ol>
+      </div>
+
       <div className="grid md:grid-cols-2 gap-4">
         <div className="si-card p-4 text-sm space-y-1.5 font-mono">
           <h2 className="si-card-h">HTTP / capture fields</h2>
@@ -101,7 +169,7 @@ export default function IncidentDetails() {
         </div>
         <div className="si-card p-4">
           <h2 className="si-card-h">URL / structural features</h2>
-          <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] font-mono">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[12px] font-mono">
             {Object.entries(feats)
               .slice(0, 24)
               .map(([k, v]) => (
@@ -119,12 +187,12 @@ export default function IncidentDetails() {
       {primary && (
         <div className="si-card p-4 border-soc-cyan/35">
           <h2 className="si-card-h">Why this was flagged</h2>
-          <p className="text-xs text-soc-muted mb-3 leading-relaxed">
+          <p className="text-[13px] text-soc-muted mb-3 leading-relaxed">
             Text below is from this event’s stored detectors and evidence. Nothing is added that the API did not
             return.
           </p>
           {supporting.length > 0 && (
-            <p className="text-xs text-amber-100/85 mb-3 border border-amber-500/20 bg-amber-500/[0.06] rounded-md px-3 py-2 leading-relaxed">
+            <p className="text-[13px] text-amber-100/85 mb-3 border border-amber-500/20 bg-amber-500/[0.06] rounded-md px-3 py-2 leading-relaxed">
               One HTTP transaction · {detections.length} correlated indicators. Supporting signatures are not separate
               successful attacks.
             </p>
@@ -140,7 +208,7 @@ export default function IncidentDetails() {
       {supporting.length > 0 && (
         <div className="si-card p-4 bg-[#080d14]">
           <h2 className="si-card-h mb-1">Supporting indicators</h2>
-          <p className="text-xs text-soc-muted mb-3 leading-relaxed">
+          <p className="text-[13px] text-soc-muted mb-3 leading-relaxed">
             Multiple indicators were observed in the same HTTP transaction. These remain on the event as signature
             matches; they are not additional CONFIRMED outcomes.
           </p>
@@ -149,7 +217,7 @@ export default function IncidentDetails() {
               <li key={d.id} className="border border-soc-border rounded-md p-3">
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span className="font-medium text-sm text-slate-200">{d.attack_type}</span>
-                  <span className="text-[10px] uppercase tracking-[0.08em] font-mono text-soc-muted border border-soc-border px-1.5 py-0.5 rounded">
+                  <span className="text-[11px] uppercase tracking-[0.08em] font-mono text-soc-muted border border-soc-border px-1.5 py-0.5 rounded">
                     indicator
                   </span>
                 </div>
@@ -163,9 +231,9 @@ export default function IncidentDetails() {
       <div className="si-card p-4">
         <h2 className="si-card-h">Related events from same source IP</h2>
         {!(data.related || []).length ? (
-          <p className="text-xs text-soc-muted">No related events.</p>
+          <p className="text-[13px] text-soc-muted">No related events.</p>
         ) : (
-          <ul className="text-xs space-y-1.5">
+          <ul className="text-[13px] space-y-1.5">
             {(data.related || []).map((r, i) => (
               <li key={i} className="flex flex-wrap items-center gap-2 border-b border-soc-border/50 py-1.5 last:border-0">
                 <Link className="text-soc-cyan font-mono hover:underline" to={`/event/${r.id}`}>
@@ -184,10 +252,27 @@ export default function IncidentDetails() {
   );
 }
 
+function present(v) {
+  if (v == null || v === "") return "Not available in captured metadata";
+  return String(v);
+}
+
+function ChainStep({ n, title, last, children }) {
+  return (
+    <li className={`relative pl-6 md:pl-8 ${last ? "pb-0" : "pb-5"}`}>
+      <span className="absolute -left-3 top-0 flex h-6 w-6 items-center justify-center rounded-full border border-soc-cyan/40 bg-[#0d1522] text-[11px] font-mono text-soc-cyan">
+        {n}
+      </span>
+      <div className="text-[11px] uppercase tracking-[0.14em] text-soc-muted mb-1.5">{title}</div>
+      <div className="text-sm text-slate-300 leading-relaxed space-y-1">{children}</div>
+    </li>
+  );
+}
+
 function Row({ k, v }) {
   return (
     <div className="flex gap-2">
-      <span className="text-soc-muted w-28 shrink-0 text-[11px] uppercase tracking-[0.06em]">{k}</span>
+      <span className="text-soc-muted w-28 shrink-0 text-[12px] uppercase tracking-[0.06em]">{k}</span>
       <span className="break-all text-slate-200">{v == null || v === "" ? "—" : String(v)}</span>
     </div>
   );

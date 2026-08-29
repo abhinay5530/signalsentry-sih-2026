@@ -6,7 +6,7 @@ export default function StatusBadge({ status }) {
   };
   return (
     <span
-      className={`inline-flex items-center text-[10px] uppercase tracking-[0.08em] px-1.5 py-0.5 rounded border font-mono leading-none ${
+      className={`inline-flex items-center text-[11px] uppercase tracking-[0.1em] px-2 py-1 rounded-md border font-mono leading-none ${
         map[status] || map.UNKNOWN
       }`}
     >
@@ -24,7 +24,7 @@ export function SeverityBadge({ severity }) {
   };
   return (
     <span
-      className={`inline-flex items-center font-mono text-[10px] uppercase tracking-[0.08em] px-1.5 py-0.5 rounded border ${
+      className={`inline-flex items-center font-mono text-[11px] uppercase tracking-[0.1em] px-2 py-1 rounded-md border ${
         map[severity] || map.low
       }`}
     >

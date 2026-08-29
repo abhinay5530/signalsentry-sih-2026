@@ -15,17 +15,17 @@ export default function Reports() {
       </p>
       <FilterBar value={filters} onChange={setFilters} />
       <div className="grid sm:grid-cols-2 gap-3 max-w-2xl">
-        <a className="si-card p-5 hover:border-soc-cyan/40 block" href={api.exportUrl("csv", qs)}>
-          <div className="text-[10px] uppercase tracking-[0.14em] text-soc-muted mb-2">Export</div>
-          <div className="text-soc-cyan font-semibold">Download CSV</div>
-          <p className="text-xs text-soc-muted mt-2 leading-relaxed">
+        <a className="si-card p-6 hover:border-soc-cyan/50 block" href={api.exportUrl("csv", qs)}>
+          <div className="si-kpi-label mb-2">Current filters</div>
+          <div className="text-soc-cyan font-semibold text-base">Download CSV</div>
+          <p className="text-[13px] text-soc-muted mt-2 leading-relaxed">
             Spreadsheet of the filtered join (same query params as Attack Explorer).
           </p>
         </a>
-        <a className="si-card p-5 hover:border-soc-cyan/40 block" href={api.exportUrl("json", qs)}>
-          <div className="text-[10px] uppercase tracking-[0.14em] text-soc-muted mb-2">Export</div>
-          <div className="text-slate-100 font-semibold">Download JSON</div>
-          <p className="text-xs text-soc-muted mt-2 leading-relaxed">
+        <a className="si-card p-6 hover:border-soc-cyan/50 block" href={api.exportUrl("json", qs)}>
+          <div className="si-kpi-label mb-2">Current filters</div>
+          <div className="text-slate-100 font-semibold text-base">Download JSON</div>
+          <p className="text-[13px] text-soc-muted mt-2 leading-relaxed">
             Same filtered set as JSON for tooling or further review.
           </p>
         </a>

@@ -49,8 +49,8 @@ export default function PcapAnalyzer() {
         availability to <span className="font-mono text-amber-50">tls_sni_only</span>. Payloads are never executed and
         URLs are never visited.
       </div>
-      <div className="si-card p-4 mb-4 flex flex-col sm:flex-row sm:items-center gap-3">
-        <p className="flex-1 text-xs text-soc-muted leading-relaxed">
+      <div className="si-card p-5 mb-4 flex flex-col sm:flex-row sm:items-center gap-4">
+        <p className="flex-1 text-sm text-soc-muted leading-relaxed">
           Upload a <span className="font-mono">.pcap</span> or <span className="font-mono">.pcapng</span>. Synthetic ingest
           may also write <span className="font-mono">backend/data/sample.pcap</span>.
         </p>

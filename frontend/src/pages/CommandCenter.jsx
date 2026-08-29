@@ -106,18 +106,6 @@ export default function CommandCenter() {
         </button>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-3">
-        <div className="si-card p-4">
-          <h2 className="si-card-h">Detection method</h2>
-          <p className="text-xs text-soc-muted leading-relaxed">
-            Rules and behavior checks run on normalized HTTP/IPDR metadata. Correlation uses request sequences and
-            available HTTP fields (for example earlier errors then a later success). An optional Random Forest score
-            is supporting only. HTTPS payloads are not decrypted.
-          </p>
-        </div>
-        <VerdictLegend />
-      </div>
-
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         {[
           ["Events", ov.events, "text-soc-cyan"],
@@ -131,6 +119,18 @@ export default function CommandCenter() {
             <div className={`si-kpi-value ${color}`}>{v}</div>
           </div>
         ))}
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-3">
+        <div className="si-card p-4">
+          <h2 className="si-card-h">Detection method</h2>
+          <p className="text-[13px] text-soc-muted leading-relaxed">
+            Rules and behavior checks run on normalized HTTP/IPDR metadata. Correlation uses request sequences and
+            available HTTP fields (for example earlier errors then a later success). An optional Random Forest score
+            is supporting only. HTTPS payloads are not decrypted.
+          </p>
+        </div>
+        <VerdictLegend />
       </div>
 
       <div className="grid lg:grid-cols-2 gap-4">
