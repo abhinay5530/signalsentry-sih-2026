@@ -1,3 +1,6 @@
+import os
+import shutil
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
@@ -5,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.routes import ingest_synthetic, router
-from app.config import CORS_ORIGINS, FRONTEND_DIST
+from app.config import CORS_ORIGINS, DB_PATH, DEMO_SQLITE, FRONTEND_DIST
 from app.db import db_session, init_db
 
 app = FastAPI(title="SentinelIP", description="IPDR/PCAP URL-attack investigation (local prototype)")
@@ -21,8 +24,17 @@ app.include_router(router)
 
 @app.on_event("startup")
 def startup():
+    _install_baked_demo_if_needed()
     init_db()
     _ensure_demo_dataset()
+
+
+def _install_baked_demo_if_needed() -> None:
+    """On Vercel, copy the build-time seed-42 DB into /tmp. Local uvicorn is unchanged."""
+    if not os.environ.get("VERCEL") or not DEMO_SQLITE.is_file() or DB_PATH.exists():
+        return
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(DEMO_SQLITE, DB_PATH)
 
 
 def _ensure_demo_dataset() -> None:
