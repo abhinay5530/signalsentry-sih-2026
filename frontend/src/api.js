@@ -1,6 +1,4 @@
-const API = import.meta.env.PROD
-  ? "https://signalsentry-sih-2026.onrender.com/api"
-  : "/api";
+const API = "/api";
 
 const RETRIES = 3;
 const RETRY_DELAY_MS = 3000;

@@ -4,6 +4,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
+# Repo-root frontend build (production). Unused when running Vite locally.
+FRONTEND_DIST = BASE_DIR.parent / "frontend" / "dist"
+
 DB_PATH = DATA_DIR / "sentinelip.db"
 ML_MODEL_PATH = BASE_DIR / "app" / "ml" / "model.joblib"
 SAMPLE_DIR = DATA_DIR
