@@ -4,9 +4,9 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.api.routes import router
+from app.api.routes import ingest_synthetic, router
 from app.config import CORS_ORIGINS, FRONTEND_DIST
-from app.db import init_db
+from app.db import db_session, init_db
 
 app = FastAPI(title="SentinelIP", description="IPDR/PCAP URL-attack investigation (local prototype)")
 app.add_middleware(
@@ -22,6 +22,16 @@ app.include_router(router)
 @app.on_event("startup")
 def startup():
     init_db()
+    _ensure_demo_dataset()
+
+
+def _ensure_demo_dataset() -> None:
+    """If SQLite has no events, load the existing seeded synthetic demo once (seed 42)."""
+    with db_session() as conn:
+        n = conn.execute("SELECT COUNT(*) AS c FROM normalized_events").fetchone()["c"]
+    if n:
+        return
+    ingest_synthetic(n=10000, seed=42)
 
 
 def _index_file():
