@@ -53,6 +53,9 @@ export default function AttackExplorer() {
           </button>
         </div>
       </div>
+      <p className="text-xs text-soc-muted mb-2 leading-relaxed">
+        Start with one filter. Combine filters only when you want to narrow the results further.
+      </p>
       <FilterBar value={filters} onChange={setFilters} />
       <div className="si-table-wrap max-h-[70vh]">
         {loading ? (

@@ -41,10 +41,13 @@ export default function FilterBar({ value, onChange, extra }) {
           <span className="si-label">IP range</span>
           <input
             className="si-input"
-            placeholder="10.50.1.0/24"
+            placeholder="e.g. 10.50.1.0/24"
             value={value.cidr || ""}
             onChange={(e) => set("cidr", e.target.value)}
           />
+          <span className="block text-[10px] text-soc-muted mt-1 leading-snug">
+            Use CIDR to investigate a network range.
+          </span>
         </label>
         <label>
           <span className="si-label">Attack type</span>
