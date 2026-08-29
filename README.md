@@ -6,6 +6,10 @@ SignalSentry helps investigators analyze IPDR-like records and PCAP captures to 
 
 This is **not** a paste-a-URL phishing checker and **not** live threat intelligence.
 
+## Live Demo
+
+**Live Demo:** https://signalsentry-sih-2026-production.up.railway.app/
+
 ## Problem / purpose
 
 Investigators often get URL and HTTP-related fields from IPDR-like logs or packet captures, but a single request is a poor basis for a verdict. SignalSentry ingests those records, runs rule-based detection, correlates related events, and lets you inspect evidence, IPs/CIDRs, and exports in one place.
@@ -60,17 +64,19 @@ Implemented families:
 
 ## 2-minute demo
 
-You need the backend and frontend running (see Quick start).
+Use the hosted app: https://signalsentry-sih-2026-production.up.railway.app/
 
-1. Open http://localhost:5173/ (landing page, not Command Center).
+1. Open the Live Demo URL (landing page, not Command Center).
 2. Click **Launch Dashboard**.
-3. Click **Load synthetic dataset** (seed 42).
+3. Click **Load synthetic dataset** (seed 42) if the demo set is not already loaded.
 4. Open **Attack Explorer** and use the filters.
 5. On **IP Investigate**, use CIDR `10.50.1.0/24`.
 6. Open an incident from a detection and read the evidence and verdict.
 7. Optionally open **PCAP Analyzer** and upload a PCAP/PCAPNG (synthetic ingest can also write `backend/data/sample.pcap`).
 
 Do not treat the synthetic run as ISP-scale or real-world accuracy.
+
+Local development (backup): after Quick start, the UI is at `http://localhost:5173/` with the API at `http://127.0.0.1:8000`. That is not the submission deployment.
 
 ## Quick start
 
@@ -106,7 +112,7 @@ npm install
 npm run dev
 ```
 
-Then follow the 2-minute demo. You can also generate data with `PYTHONPATH=. python datasets/generate.py` from `backend/`.
+Then follow the 2-minute demo steps locally. You can also generate data with `PYTHONPATH=. python datasets/generate.py` from `backend/`.
 
 ## Testing
 
